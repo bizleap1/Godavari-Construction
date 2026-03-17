@@ -138,7 +138,7 @@ html.lenis {
   color: var(--primary);
 }
 
-/* Header & Navigation - White & Yellow */
+/* Header & Navigation */
 .header {
   position: fixed;
   top: 0;
@@ -150,10 +150,43 @@ html.lenis {
   background: transparent;
 }
 
+/* Home Page Header (Transparent State) */
+.home-page .header:not(.scrolled) .logo a {
+  color: var(--accent);
+}
+.home-page .header:not(.scrolled) .nav-links li a {
+  color: rgba(255, 255, 255, 0.8);
+}
+.home-page .header:not(.scrolled) .nav-links li a:hover,
+.home-page .header:not(.scrolled) .nav-links li a.active {
+  color: var(--primary);
+}
+.home-page .header:not(.scrolled) .mobile-menu-btn span {
+  background: var(--accent);
+}
+
 .header.scrolled {
   background: var(--accent);
   padding: 15px 0;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+/* Solid Header (Scrolled or Subpages) */
+.header.scrolled .logo a,
+body:not(.home-page) .header .logo a {
+  color: var(--secondary);
+}
+
+.header.scrolled .nav-links li a,
+body:not(.home-page) .header .nav-links li a {
+  color: var(--text-muted);
+}
+
+.header.scrolled .nav-links li a:hover,
+.header.scrolled .nav-links li a.active,
+body:not(.home-page) .header .nav-links li a:hover,
+body:not(.home-page) .header .nav-links li a.active {
+  color: var(--secondary);
 }
 
 /* Subpages always have solid header */
@@ -216,8 +249,34 @@ body:not(.home-page) .header {
   width: 100%;
 }
 
-.nav-links li a:hover, .nav-links li a.active {
-  color: var(--secondary);
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  z-index: 1002;
+  padding: 10px;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  width: 25px;
+  height: 2px;
+  background: var(--secondary);
+  transition: var(--trans-smooth);
+}
+
+.mobile-menu-btn.open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-btn.open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /* Hero Section (Homepage Only) */
@@ -616,8 +675,40 @@ body:not(.home-page) .header {
 /* Responsive */
 @media (max-width: 1024px) {
   .nav-wrap { gap: 30px; }
+  .nav-links { gap: 20px; }
 }
 
 @media (max-width: 768px) {
+  .nav-cta { display: none; }
+  
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 80%;
+    height: 100vh;
+    background: var(--accent);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    transition: var(--trans-smooth);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    right: 0;
+  }
+
+  .nav-links li a {
+    font-size: 1.5rem;
+    color: var(--secondary) !important;
+  }
+
   .projects-grid { grid-template-columns: 1fr; }
 }
