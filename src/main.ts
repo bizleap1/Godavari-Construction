@@ -59,6 +59,8 @@ gsap.to(".parallax", {
   ease: "none"
 });
 
+
+
 // Global Scroll Reveals
 const revealElements = document.querySelectorAll('.reveal');
 revealElements.forEach((el) => {
@@ -75,121 +77,404 @@ revealElements.forEach((el) => {
   });
 });
 
-// Stats Counter Animation
-const stats = document.querySelectorAll('.stat-number');
+
+// Impact Section Count-Up Animation
+const stats = document.querySelectorAll('.stat-card .number');
 stats.forEach(stat => {
-  const targetAttr = stat.getAttribute('data-target');
-  if (targetAttr) {
-    const target = parseInt(targetAttr);
+    const target = parseFloat(stat.getAttribute('data-target') || '0');
+    const suffix = stat.getAttribute('data-suffix') || '+';
+    
     gsap.to(stat, {
-      scrollTrigger: {
-        trigger: stat,
-        start: "top 90%",
-      },
-      innerHTML: target,
-      duration: 2.5,
-      snap: { innerHTML: 1 },
-      ease: "power2.out"
+        scrollTrigger: {
+            trigger: stat,
+            start: "top 95%",
+            once: true
+        },
+        innerText: target,
+        duration: 2.5,
+        snap: { innerText: target % 1 === 0 ? 1 : 0.1 }, 
+        onUpdate: function() {
+            const currentVal = parseFloat((this.targets()[0] as HTMLElement).innerText);
+            if (target % 1 !== 0) {
+               (this.targets()[0] as HTMLElement).innerText = currentVal.toFixed(1) + suffix;
+            } else {
+               (this.targets()[0] as HTMLElement).innerText = Math.round(currentVal) + suffix;
+            }
+        }
     });
-  }
 });
 
-// Services Modal Logic - Re-engineered for Case Study Format
-const serviceCards = document.querySelectorAll('.service-card');
-const modalOverlay = document.createElement('div');
-modalOverlay.className = 'modal-overlay';
-modalOverlay.innerHTML = `
-  <div class="modal-content">
-    <div class="modal-close">&times;</div>
-    <div class="case-study-header">
-      <span class="case-study-tag">Case Study</span>
-      <h2 id="modal-title"></h2>
-    </div>
-    <div class="case-study-grid">
-      <div class="case-study-main">
-        <section>
-          <h4>The Challenge</h4>
-          <p id="modal-challenge"></p>
-        </section>
-        <section>
-          <h4>Our Solution</h4>
-          <p id="modal-solution"></p>
-        </section>
-        <section>
-          <h4>Key Outcome</h4>
-          <p id="modal-outcome"></p>
-        </section>
-      </div>
-      <div class="case-study-sidebar">
-        <span class="sidebar-title">Project Profile</span>
-        <div class="detail-item">
-          <span class="detail-label">Service Type</span>
-          <span class="detail-value" id="modal-service"></span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Tech Stack</span>
-          <span class="detail-value" id="modal-tech">Advanced BIM, High-Tensile Steel</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Duration</span>
-          <span class="detail-value">Ongoing / Finished</span>
-        </div>
-      </div>
-    </div>
-  </div>
-`;
-document.body.appendChild(modalOverlay);
+console.log('Godavari Construction Premium Redesign Active');
 
-const modalTitle = document.getElementById('modal-title') as HTMLElement;
-const modalChallenge = document.getElementById('modal-challenge') as HTMLElement;
-const modalSolution = document.getElementById('modal-solution') as HTMLElement;
-const modalOutcome = document.getElementById('modal-outcome') as HTMLElement;
-const modalService = document.getElementById('modal-service') as HTMLElement;
-const closeModalBtn = modalOverlay.querySelector('.modal-close') as HTMLElement;
+// Case Study Data & Modal Logic
 
-serviceCards.forEach(card => {
-  card.addEventListener('click', () => {
-    const title = card.getAttribute('data-title');
-    const challenge = card.getAttribute('data-challenge') || "Identifying structural bottlenecks and optimizing resource allocation for complex terrain.";
-    const solution = card.getAttribute('data-solution') || "Implementing advanced 3D modeling and sustainable construction techniques to ensure longevity.";
-    const outcome = card.getAttribute('data-outcome') || "A landmark structure delivered with zero-accident safety records and 100% material efficiency.";
-    const service = card.getAttribute('data-service') || "General Construction";
+const caseStudiesData: Record<string, { title: string, subtitle: string, description: string, services: string[], challenge: string, solution: string, outcome: string }> = {
 
-    if (title) {
-      modalTitle.textContent = title;
-      modalChallenge.textContent = challenge;
-      modalSolution.textContent = solution;
-      modalOutcome.textContent = outcome;
-      modalService.textContent = service;
-      
-      modalOverlay.classList.add('active');
-      gsap.from('.modal-content', { 
-        y: 100, 
-        opacity: 0, 
-        duration: 0.8, 
-        ease: 'power4.out' 
-      });
-      lenis.stop(); // Stop scroll when modal open
+
+    'elite-residency': {
+        title: 'Elite Residency',
+        subtitle: 'Luxury Residential | 2024',
+        description: 'A premium 150-unit residential tower featuring panoramic city views, smart home integrations, and world-class amenities.',
+        services: ['Architectural Design', 'Structural Engineering', 'Interior Finishing', 'MEP Solutions'],
+        challenge: 'Urban density constraints required innovative vertical design while maintaining luxury standards and natural light penetration.',
+        solution: 'Implemented cantilevered wing design with floor-to-ceiling glass facades and advanced MEP systems for optimal space utilization.',
+        outcome: 'Delivered 20% ahead of schedule with 100% occupancy within 3 months of handover. Received Best Luxury Residential award.'
+    },
+
+    'heritage-square': {
+        title: 'Heritage Square',
+        subtitle: 'Premier Retail Hub | 2023',
+        description: 'Heritage Square is a sprawling retail complex designed to merge modern aesthetics with maximum foot traffic utility. The project was completed two months ahead of schedule.',
+        services: ['Commercial Construction', 'Site Planning', 'Safety Management'],
+        challenge: 'Strict city zoning laws restricting structural footprints.',
+        solution: 'Developed a sophisticated multi-level subterranean design.',
+        outcome: 'Expanded retail capacity by 40% without violating local zoning codes.'
+    },
+    'construction-flow': {
+        title: 'Construction Flow',
+        subtitle: 'On-Site Progress | 2022',
+        description: 'Showcasing our streamlined on-site logistics and machinery deployment, ensuring smooth transitions between project phases.',
+        services: ['Project Management', 'Heavy Machinery Operation', 'Site Logistics'],
+        challenge: 'Synchronizing trades in a high-density zone',
+        solution: 'Implemented digital twin modeling for logistics',
+        outcome: 'Reduced site waste by 15% and improved trade turnaround'
+    },
+    'industrial-park-south': {
+        title: 'Industrial Park South',
+        subtitle: 'Logistics Hub | 2023',
+        description: 'A massive 50-acre industrial park built to support heavy manufacturing and national distribution pipelines.',
+        services: ['Industrial Construction', 'Foundation Laying', 'Steel Frameworks'],
+        challenge: 'Deep soil instability required massive foundational redesign',
+        solution: 'Deployed complex micro-piling network across 50 acres',
+        outcome: 'Secured structural integrity exceeding international warehouse standards'
+    },
+    'infrastructure-beats': {
+        title: 'Infrastructure Beats',
+        subtitle: 'Urban Engineering | 2024',
+        description: 'A robust urban infrastructure project updating city intersections and vital commuter pathways.',
+        services: ['Urban Planning', 'Civil Engineering', 'Roadwork'],
+        challenge: 'Maintaining city traffic loops during major roadwork',
+        solution: 'Detailed phased closure and rapid-cure aggregate materials',
+        outcome: 'Completed intersection overhaul 3 weeks ahead of public deadline'
+    },
+    'modern-office-tower': {
+        title: 'Modern Office Tower',
+        subtitle: 'Corporate Space | 2022',
+        description: 'A 40-story corporate tower designed for tech companies, featuring smart-building integrations and eco-friendly climate controls.',
+        services: ['High-Rise Construction', 'Smart Glass Installation', 'HVAC Routing'],
+        challenge: 'Extreme wind sheer testing on high floors',
+        solution: 'Custom tuned mass damper installation and aerodynamic facade',
+        outcome: 'Achieved LEED Platinum certification for energy efficiency'
+    },
+    'structural-precision': {
+        title: 'Structural Precision',
+        subtitle: 'Beam Integration | 2024',
+        description: 'Detailed focus on our structural engineering phase, demonstrating the high precision steel beam integrations we standardly deploy.',
+        services: ['Steel Fabrication', 'Structural Welding', 'Load Testing'],
+        challenge: 'Complex geometric tolerances on custom spans',
+        solution: 'Laser-guided CNC fabrication and multi-point automated checks',
+        outcome: 'Zero-fault structural assembly on site'
+    },
+    'foundation-works': {
+        title: 'Foundation Works',
+        subtitle: 'Project Core | 2023',
+        description: 'The critical early life of a skyscraper, highlighting the deep foundation pouring and site stabilization process.',
+        services: ['Excavation', 'Concrete Pouring', 'Site Stabilization'],
+        challenge: 'High water tables threatened the pour',
+        solution: 'Continuous de-watering matrix and fast-cure marine concrete',
+        outcome: 'Perfect foundational pour completed in a 48-hour continuous operation'
+    },
+    'machinery-in-motion': {
+        title: 'Machinery in Motion',
+        subtitle: 'Site Logistics | 2023',
+        description: 'Operating heavy crane machinery and coordinating complex lifts in dense urban environments without disrupting local traffic.',
+        services: ['Crane Operations', 'Urban Logistics', 'Safety Protocols'],
+        challenge: 'Navigating overhead power lines during blind lifts',
+        solution: 'Advanced riggers and multi-camera lift telemetry',
+        outcome: '100% safety record with zero traffic disruptions'
+    },
+    'skyline-builders': {
+        title: 'Skyline Builders',
+        subtitle: 'Vertical Growth | 2024',
+        description: 'The final stages of structural completion where the building core meets the sky, integrating the roof truss networks.',
+        services: ['Roofing Systems', 'Vertical Integration', 'Final Structural Checks'],
+        challenge: 'Weather dependencies at extreme altitudes',
+        solution: 'Pre-fabricated modular roof trusses assembled internally',
+        outcome: 'Topped out safely weeks before seasonal monsoon rains'
     }
-  });
-});
-
-const closeModal = () => {
-  gsap.to('.modal-content', { 
-    y: 50, 
-    opacity: 0, 
-    duration: 0.4, 
-    onComplete: () => {
-      modalOverlay.classList.remove('active');
-      gsap.set('.modal-content', { y: 0, opacity: 1 });
-      lenis.start(); // Start scroll again
-    } 
-  });
 };
 
-closeModalBtn.addEventListener('click', closeModal);
-modalOverlay.addEventListener('click', (e) => {
-  if (e.target === modalOverlay) closeModal();
+// Modal Initialization Logic
+document.addEventListener('DOMContentLoaded', () => {
+    // Dynamically inject buttons into portfolio overlays if they don't exist
+    const overlays = document.querySelectorAll('.portfolio-overlay');
+    overlays.forEach(overlay => {
+        if (!overlay.querySelector('.know-more-btn')) {
+            const h3 = overlay.querySelector('h3');
+            const title = h3 ? h3.textContent || 'Project' : 'Project';
+            const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-outline know-more-btn';
+            btn.setAttribute('data-case', slug);
+            btn.textContent = 'Know More';
+            overlay.appendChild(btn);
+        }
+    });
+
+    // Dynamically inject the Modal HTML if it doesn't exist
+    if (!document.getElementById('caseStudyModal')) {
+        const modalHtml = `
+            <div id="caseStudyModal" class="case-study-modal">
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <button class="close-modal">&times;</button>
+                    <div class="modal-body" id="modalBody">
+                        <h2 id="modalTitle">Project Title</h2>
+                        <p class="modal-subtitle" id="modalSubtitle">Category | Year</p>
+                        <div class="modal-details">
+                            <p id="modalDescription">Project description goes here.</p>
+                            <h3>Services Provided:</h3>
+                            <ul id="modalServices"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    // Modal Interaction Logic
+    const modal = document.getElementById('caseStudyModal');
+    const overlayBg = modal?.querySelector('.modal-overlay');
+    const closeBtn = modal?.querySelector('.close-modal');
+    
+    const titleEl = document.getElementById('modalTitle');
+    const subtitleEl = document.getElementById('modalSubtitle');
+    const descEl = document.getElementById('modalDescription');
+    const servicesEl = document.getElementById('modalServices');
+
+    const openModal = (slug: string) => {
+        if (!modal) return;
+        
+        let data = caseStudiesData[slug];
+        if (!data) {
+            // Fallback for an unknown project
+            data = {
+                title: 'Featured Project',
+                subtitle: 'Premium Construction',
+                description: 'This is a premium project completed by Godavari Construction showcasing our commitment to quality, safety, and modern engineering.',
+                services: ['General Contracting', 'Design-Build', 'Project Management'],
+                challenge: 'Rigorous urban planning schedules and space constraints.',
+                solution: 'Deployed modular construction techniques to bypass delays.',
+                outcome: 'Project finalized 20% faster than standard industry projections.'
+            };
+        }
+
+        if (titleEl) titleEl.textContent = data.title;
+        if (subtitleEl) subtitleEl.textContent = data.subtitle;
+        if (descEl) descEl.textContent = data.description;
+        
+        if (servicesEl) {
+            servicesEl.innerHTML = '';
+            data.services.forEach(service => {
+                const li = document.createElement('li');
+                li.textContent = service;
+                servicesEl.appendChild(li);
+            });
+        }
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    };
+
+    const closeModal = () => {
+        modal?.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    // Attach click events to dynamic buttons via event delegation
+    document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('know-more-btn')) {
+            const slug = target.getAttribute('data-case');
+            if (slug) openModal(slug);
+        }
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+    overlayBg?.addEventListener('click', closeModal);
 });
 
-console.log('Godavari Construction Re-engineered');
+// Services Data & Modal Logic
+const servicesData: Record<string, { title: string, description: string, benefits: string[], process: string[], image: string }> = {
+    'residential': {
+        title: 'Residential Construction',
+        image: 'src/assets/GC%202.jpeg',
+        description: 'Bespoke luxury homes and smart residential complexes designed with modern amenities. We handle everything from architectural planning to the final finishing touches.',
+        benefits: ['Custom Home Design & Build', 'Smart Home Integration', 'Sustainable Materials', 'End-to-end Project Management'],
+        process: ['Concept & Blueprint Approval', 'Structural & Core Construction', 'Interior Finishing & Final Handover']
+    },
+    'commercial': {
+        title: 'Commercial Hubs',
+        image: 'src/assets/GC%207.jpeg',
+        description: 'Future-ready office spaces and retail hubs designed for maximum efficiency, tenant comfort, and high foot traffic. Built to international safety and sustainability standards.',
+        benefits: ['High-Rise Office Construction', 'Retail Core Development', 'Advanced HVAC & MEP', 'LEED Certified Practices'],
+        process: ['Site Logistics & Permitting', 'Erection of Core and Shell', 'Tenant Improvement & Fit-outs']
+    },
+    'renovations': {
+        title: 'Structural Renovations',
+        image: 'src/assets/GC%203.jpeg',
+        description: 'Restoring and modernizing older structures with cutting-edge engineering. We breathe new life into existing buildings while preserving their historical integrity where required.',
+        benefits: ['Structural Reinforcements', 'Facade Modernization', 'Interior Gut Remodels', 'Code Compliance Upgrades'],
+        process: ['Structural Integrity Assessment', 'Selective Demolition & Shoring', 'Modern Re-integration & Trimming']
+    },
+    'architecture': {
+        title: 'Architectural Planning',
+        image: 'src/assets/GC%204.jpeg',
+        description: 'Innovative designs that balance aesthetic beauty, structural functionality, and environmental sustainability. Our architects work closely with clients to visualize their perfect space.',
+        benefits: ['3D Modeling & Visualization', 'Zoning & Permitting', 'Sustainable Design', 'Landscape Architecture'],
+        process: ['Client Vision Briefing', 'Digital Twin & 3D Modeling', 'Final Permitting & Material Sourcing']
+    },
+    'interior-work': {
+        title: 'Interior Excellence',
+        image: 'src/assets/GC%206.jpeg',
+        description: 'Specialized interior solutions for luxury homes and professional corporate spaces. We focus on ergonomics, lighting, and premium material selection.',
+        benefits: ['Space Planning', 'Custom Millwork & Cabinetry', 'Lighting Design', 'Premium Material Sourcing'],
+        process: ['Space & Flow Analysis', 'Custom Fabrication & Procurement', 'Installation & Quality Polish']
+    }
+};
+
+// Services Modal Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Transform existing buttons into "Know More" triggers on the Services page
+    const serviceButtons = document.querySelectorAll('.service-overlay .btn');
+    serviceButtons.forEach(btn => {
+        const card = btn.closest('.service-card');
+        if (card) {
+            const h3 = card.querySelector('h3');
+            const title = h3 ? h3.textContent || 'Service' : 'Service';
+            const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            
+            btn.textContent = 'Know More';
+            btn.className = 'btn btn-outline service-know-more-btn';
+            btn.setAttribute('data-service', slug);
+            btn.setAttribute('href', 'javascript:void(0)');
+        }
+    });
+
+    // 2. Inject Detailed Services Modal HTML
+    if (document.querySelector('.service-know-more-btn') && !document.getElementById('servicesModal')) {
+        const modalHtml = `
+            <div id="servicesModal" class="services-modal">
+                <div class="modal-overlay"></div>
+                <div class="modal-content white-theme">
+                    <button class="close-modal">&times;</button>
+                    <div class="modal-body" id="serviceModalBody">
+                        <h2 id="serviceModalTitle" class="theme-title">Service Title</h2>
+                        <div class="theme-divider"></div>
+                        <p class="theme-desc" id="serviceModalDescription">Description...</p>
+                        
+                        <div class="theme-dual-col">
+                            <div class="theme-benefits-box">
+                                <h3 class="theme-subtitle">Key Benefits</h3>
+                                <ul id="serviceModalBenefits" class="theme-list"></ul>
+                            </div>
+                            <div class="theme-process-box">
+                                <h3 class="theme-subtitle">Our Process</h3>
+                                <div id="serviceModalProcess" class="theme-process-steps"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    // 3. Services Modal Interaction Logic
+    const sModal = document.getElementById('servicesModal');
+    const sOverlayBg = sModal?.querySelector('.modal-overlay');
+    const sCloseBtn = sModal?.querySelector('.close-modal');
+    
+    const sTitleEl = document.getElementById('serviceModalTitle');
+    const sDescEl = document.getElementById('serviceModalDescription');
+    const sBenefitsEl = document.getElementById('serviceModalBenefits');
+    const sProcessEl = document.getElementById('serviceModalProcess');
+
+    const openServiceModal = (slug: string) => {
+        if (!sModal) return;
+        
+        let data = servicesData[slug];
+        if (!data) {
+            data = {
+                title: 'Professional Service',
+                image: 'src/assets/GC%202.jpeg',
+                description: 'Godavari Construction offers a wide suite of premium services tailored to your exact needs. Contact us to learn more.',
+                benefits: ['Expert Consultation', 'Quality Craftsmanship', 'On-Time Delivery'],
+                process: ['Initial Consultation', 'Planning Phase', 'Execution & Delivery']
+            };
+        }
+
+        if (sTitleEl) sTitleEl.textContent = data.title;
+        if (sDescEl) sDescEl.textContent = data.description;
+        
+        if (sBenefitsEl) {
+            sBenefitsEl.innerHTML = '';
+            data.benefits.forEach(benefit => {
+                const li = document.createElement('li');
+                li.textContent = benefit;
+                sBenefitsEl.appendChild(li);
+            });
+        }
+
+        if (sProcessEl) {
+            sProcessEl.innerHTML = '';
+            data.process.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'theme-process-step';
+                stepDiv.innerHTML = '<span class="step-num">' + (index + 1) + '</span><span class="step-text">' + step + '</span>';
+                sProcessEl.appendChild(stepDiv);
+            });
+        }
+
+        sModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; 
+    };
+
+    const closeServiceModal = () => {
+        sModal?.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    // Attach click events via event delegation
+    document.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('service-know-more-btn')) {
+            e.preventDefault();
+            const slug = target.getAttribute('data-service');
+            if (slug) openServiceModal(slug);
+        }
+    });
+
+    sCloseBtn?.addEventListener('click', closeServiceModal);
+    sOverlayBg?.addEventListener('click', closeServiceModal);
+});
+
+// Video Hover Playback Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    portfolioItems.forEach(item => {
+        const video = item.querySelector('video');
+        if (video) {
+            item.addEventListener('mouseenter', () => {
+                video.play().catch(err => console.warn("Video play interrupted or blocked:", err));
+            });
+            item.addEventListener('mouseleave', () => {
+                video.pause();
+                video.currentTime = 0; // Optional: Reset to start on leave
+            });
+        }
+    });
+});
+
