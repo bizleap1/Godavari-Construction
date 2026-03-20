@@ -4,13 +4,380 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio | Godavari Construction</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" href="/src/assets/IMG_1593.PNG">
+    <style>
+        /* ── Projects Page Specific Styles ── */
+
+        /* Hero Banner */
+        .projects-hero {
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            background: #063b3b;
+            padding-top: 180px;
+        }
+        .projects-hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('src/assets/GC 1.jpeg') center/cover no-repeat;
+            transform: scale(1.05);
+            filter: brightness(0.35);
+        }
+        .projects-hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 0 40px 50px;
+            max-width: 1320px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .projects-hero-content .tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #ffde00;
+            border: 1px solid rgba(255,222,0,0.4);
+            padding: 5px 14px;
+            border-radius: 100px;
+            margin-bottom: 16px;
+        }
+        .projects-hero-content h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .projects-hero-content h1 span { color: #ffde00; }
+        .projects-hero-content p {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            max-width: 480px;
+            line-height: 1.7;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 36px 0 10px;
+        }
+        .filter-btn {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            padding: 9px 22px;
+            border-radius: 100px;
+            border: 1.5px solid rgba(6,59,59,0.2);
+            background: transparent;
+            color: #063b3b;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #063b3b;
+            color: #ffde00;
+            border-color: #063b3b;
+        }
+        .filter-count {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #bebebe;
+            font-weight: 600;
+        }
+
+        /* Projects Grid */
+        .portfolio-section {
+            padding: 40px 0 100px;
+        }
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .portfolio-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            cursor: pointer;
+            background: #111;
+            border: 1px solid rgba(0,0,0,0.06);
+            transform: translateY(0);
+            transition: transform 0.5s cubic-bezier(0.2,1,0.3,1), box-shadow 0.5s ease;
+        }
+        .portfolio-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.18);
+        }
+        .portfolio-card.hidden { display: none; }
+
+        /* Stagger reveal */
+        .portfolio-card {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2,1,0.3,1), box-shadow 0.5s ease;
+        }
+        .portfolio-card.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .portfolio-card.revealed:hover { transform: translateY(-6px); }
+
+        .portfolio-card video,
+        .portfolio-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.2,1,0.3,1);
+        }
+        .portfolio-card:hover video,
+        .portfolio-card:hover img {
+            transform: scale(1.07);
+        }
+
+        /* Grain texture overlay */
+        .portfolio-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.4;
+        }
+
+        /* Gradient overlay */
+        .portfolio-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 40%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 28px;
+        }
+        .portfolio-card:hover .portfolio-card-overlay { opacity: 1; }
+
+        .portfolio-card-meta {
+            transform: translateY(14px);
+            transition: transform 0.4s cubic-bezier(0.2,1,0.3,1);
+        }
+        .portfolio-card:hover .portfolio-card-meta { transform: translateY(0); }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #ffde00;
+            background: rgba(255,222,0,0.15);
+            border: 1px solid rgba(255,222,0,0.35);
+            padding: 3px 10px;
+            border-radius: 100px;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        .card-location {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .card-explore {
+            margin-top: 14px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #ffde00;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-explore svg { transition: transform 0.3s ease; }
+        .portfolio-card:hover .card-explore svg { transform: translateX(4px); }
+
+        /* Category badge on card corner */
+        .card-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            z-index: 4;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #fff;
+        }
+
+        /* ── Fullscreen Modal ── */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.96);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .modal-backdrop.open { display: flex; }
+
+        .modal-close {
+            position: absolute;
+            top: 24px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            z-index: 10001;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+        .modal-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1000px;
+            padding: 24px;
+            gap: 20px;
+        }
+        .modal-nav-btn {
+            width: 50px;
+            height: 50px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .modal-nav-btn:hover { background: rgba(255,222,0,0.15); border-color: #ffde00; color: #ffde00; }
+
+        .modal-media-wrap {
+            flex: 1;
+            max-height: 72vh;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-media-wrap video,
+        .modal-media-wrap img {
+            width: 100%;
+            height: 100%;
+            max-height: 72vh;
+            object-fit: contain;
+        }
+
+        .modal-info {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #fff;
+        }
+        .modal-info h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            color: #ffde00;
+            margin-bottom: 4px;
+        }
+        .modal-info-meta {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+        }
+        .modal-info-meta span { display: flex; align-items: center; gap: 4px; }
+
+        .modal-counter {
+            position: absolute;
+            top: 28px;
+            left: 30px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.1em;
+        }
+
+        /* No results */
+        .no-results {
+            display: none;
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 0;
+            color: #bebebe;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .portfolio-grid { grid-template-columns: 1fr; gap: 14px; }
+            .projects-hero-content { padding: 0 20px 40px; }
+            .filter-bar { gap: 8px; }
+            .modal-inner { padding: 12px; gap: 10px; }
+            .modal-nav-btn { width: 36px; height: 36px; font-size: 1rem; }
+        }
+    </style>
 </head>
 <body>
     <header class="header">
         <div class="container nav-container">
             <div class="logo">
-                <a href="index.html">Godavari <span>Construction</span></a>
+                <a href="index.html"><img src="/src/assets/IMG_1593.PNG" alt="Godavari Construction"></a>
             </div>
             <div class="nav-wrap">
                 <nav>
@@ -23,114 +390,264 @@
                     </ul>
                 </nav>
                 <div class="nav-cta">
-                    <a href="contact.html" class="btn btn-primary">Get Expert Advice</a>
+                    <a href="tel:+917620488247" class="btn btn-primary">Get Expert Advice</a>
                 </div>
                 <div class="mobile-menu-btn">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                    <span></span><span></span><span></span>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="subpage-main">
-        <section class="section pt-xs">
+    <main>
+        <!-- Projects Hero -->
+        <section class="projects-hero">
+            <div class="projects-hero-bg"></div>
+            <div class="projects-hero-content">
+                <h1>Built With <span>Purpose</span></h1>
+                <p>Every project tells a story of craftsmanship, precision, and trust — built to stand the test of time.</p>
+            </div>
+        </section>
+
+        <!-- Portfolio Grid -->
+        <section class="portfolio-section">
             <div class="container">
-                <div class="subpage-title reveal">
-                    <h1>Our Featured Projects</h1>
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-filter="all">All Projects</button>
+                    <button class="filter-btn" data-filter="residential">Residential</button>
+                    <button class="filter-btn" data-filter="commercial">Commercial</button>
+                    <button class="filter-btn" data-filter="ongoing">Ongoing</button>
+                    <span class="filter-count" id="project-count"></span>
                 </div>
 
-                <div class="projects-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
-                    <div class="portfolio-item reveal">
+                <!-- Grid -->
+                <div class="portfolio-grid" id="portfolio-grid">
+
+                    <div class="portfolio-card" data-category="residential" data-index="0"
+                         data-title="Villa Complex – Phase I" data-location="Nagpur, Maharashtra"
+                         data-type="Residential" data-area="4,200 sq.ft" data-year="2024">
+                        <span class="card-badge">Residential</span>
                         <video muted loop playsinline src="src/assets/quality_restoration_20260318151830354.mp4"></video>
-                        <div class="portfolio-overlay">
-                            <h3>Chhatrapati Square Site</h3>
-                            <p style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Residential Excellence</p>
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Residential</span>
+                                <div class="card-title">Villa Complex – Phase I</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Nagpur, Maharashtra
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="portfolio-item reveal">
+
+                    <div class="portfolio-card" data-category="commercial" data-index="1"
+                         data-title="Corporate Office Tower" data-location="Nagpur, Maharashtra"
+                         data-type="Commercial" data-area="12,800 sq.ft" data-year="2024">
+                        <span class="card-badge">Commercial</span>
                         <video muted loop playsinline src="src/assets/gc 10.mp4"></video>
-                        <div class="portfolio-overlay">
-                            <h3>Besa Square Site</h3>
-                            <p style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Modern Living</p>
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Commercial</span>
+                                <div class="card-title">Corporate Office Tower</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Nagpur, Maharashtra
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="portfolio-item reveal">
-                        <video muted loop playsinline src="src/assets/gc 11.mp4"></video>
-                        <div class="portfolio-overlay">
-                            <h3>Wedahari Commercial Complex</h3>
-                            <p style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Premier Commercial Hub</p>
+
+                    <div class="portfolio-card" data-category="ongoing" data-index="2"
+                         data-title="Luxury Residences" data-location="Wardha Road, Nagpur"
+                         data-type="Ongoing" data-area="8,500 sq.ft" data-year="2025">
+                        <span class="card-badge">Ongoing</span>
+                        <video autoplay muted loop playsinline src="src/assets/gc 11.mp4"></video>
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Ongoing</span>
+                                <div class="card-title">Luxury Residences</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Wardha Road, Nagpur
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="portfolio-item reveal">
+
+                    <div class="portfolio-card" data-category="residential" data-index="3"
+                         data-title="Premium Bungalow" data-location="Hingna, Nagpur"
+                         data-type="Residential" data-area="3,600 sq.ft" data-year="2023">
+                        <span class="card-badge">Residential</span>
                         <video muted loop playsinline src="src/assets/gc 8 copy.mp4"></video>
-                        <div class="portfolio-overlay">
-                            <h3>Omkar Nagar Square Site</h3>
-                            <p style="color: var(--primary); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">Infrastructure Precision</p>
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Residential</span>
+                                <div class="card-title">Premium Bungalow</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Hingna, Nagpur
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="portfolio-card" data-category="commercial" data-index="4"
+                         data-title="Retail Commercial Hub" data-location="Ganeshpeth, Nagpur"
+                         data-type="Commercial" data-area="9,200 sq.ft" data-year="2023">
+                        <span class="card-badge">Commercial</span>
+                        <img src="src/assets/image copy.png" alt="Retail Commercial Hub">
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Commercial</span>
+                                <div class="card-title">Retail Commercial Hub</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Ganeshpeth, Nagpur
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="portfolio-card" data-category="residential" data-index="5"
+                         data-title="Modern Apartment Block" data-location="Civil Lines, Nagpur"
+                         data-type="Residential" data-area="6,100 sq.ft" data-year="2022">
+                        <span class="card-badge">Residential</span>
+                        <img src="src/assets/GC 1.jpeg" alt="Modern Apartment Block">
+                        <div class="portfolio-card-overlay">
+                            <div class="portfolio-card-meta">
+                                <span class="card-tag">Residential</span>
+                                <div class="card-title">Modern Apartment Block</div>
+                                <div class="card-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    Civil Lines, Nagpur
+                                </div>
+                                <div class="card-explore">
+                                    View Project
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="no-results" id="no-results">
+                        <p style="font-size:1.1rem;">No projects found in this category.</p>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- ── MODAL ── -->
+    <div class="modal-backdrop" id="modal" role="dialog" aria-modal="true">
+        <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+        <span class="modal-counter" id="modal-counter"></span>
+        <div class="modal-inner">
+            <button class="modal-nav-btn" id="modal-prev" aria-label="Previous">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="modal-media-wrap" id="modal-media"></div>
+            <button class="modal-nav-btn" id="modal-next" aria-label="Next">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+        </div>
+        <div class="modal-info" id="modal-info">
+            <h3 id="modal-title"></h3>
+            <div class="modal-info-meta" id="modal-meta"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 60px;">
-                <div class="footer-col">
-                    <div class="logo">GODAVARI <span>CONSTRUCTION</span></div>
-                    <p>India's leading construction firm specializing in residential, commercial, and industrial infrastructure excellence.</p>
-                    <div class="social-links" style="display: flex; gap: 15px; margin-top: 20px;">
-                        <a href="#" style="color: var(--primary); transition: color 0.3s ease;" title="Instagram">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            <div class="footer-grid">
+                <div class="footer-col footer-brand">
+                    <div class="footer-logo"><img src="/src/assets/IMG_1593.PNG" alt="Godavari Construction"></div>
+                    <p>India's trusted construction firm delivering residential, commercial, and industrial excellence since 2016.</p>
+                    <div class="footer-socials">
+                        <a href="https://www.instagram.com/godavariconstruction.in?igsh=MWR3ZThsMXQ4Y3Fqdw%3D%3D&utm_source=qr" title="Instagram" aria-label="Instagram" target="_blank">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                         </a>
-                        <a href="#" style="color: var(--primary); transition: color 0.3s ease;" title="LinkedIn">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        <a href="#" title="LinkedIn" aria-label="LinkedIn">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
                         </a>
-                        <a href="mailto:info@godavari.com" style="color: var(--primary); transition: color 0.3s ease;" title="Email Us">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        <a href="mailto:godavariconstruction2016@gmail.com" title="Email" aria-label="Email">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                         </a>
                     </div>
                 </div>
+
                 <div class="footer-col">
-                    <h3>Quick Links</h3>
+                    <h4>Quick Links</h4>
                     <ul class="footer-links">
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="about.html">About Us</a></li>
                         <li><a href="services.html">Services</a></li>
                         <li><a href="projects.html">Projects</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
                 </div>
+
                 <div class="footer-col">
-                    <h3>Services</h3>
+                    <h4>Services</h4>
                     <ul class="footer-links">
                         <li>Residential Construction</li>
                         <li>Commercial Buildings</li>
-                        <li>Renovation</li>
+                        <li>Renovation &amp; Interiors</li>
                         <li>Architectural Design</li>
-                        <li>Interior Excellence</li>
+                        <li>Project Consultation</li>
                     </ul>
                 </div>
+
                 <div class="footer-col">
-                    <h3>Contact Us</h3>
-                    <ul class="footer-links" style="padding: 0; display: flex; flex-direction: column; gap: 12px;">
-                        <li>📍 Ganeshpeth, Nagpur, Maharashtra</li>
-                        <li>📞 <a href="tel:+917620488247" style="color: inherit;">+91 7620 488 247</a></li>
-                        <li>✉️ <a href="mailto:info@godavari.com" style="color: inherit;">info@godavari.com</a></li>
+                    <h4>Contact</h4>
+                    <ul class="footer-links footer-contact">
+                        <li>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            Ganeshpeth, Nagpur, Maharashtra
+                        </li>
+                        <li>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                            <a href="tel:+917620488247">+91 7620 488 247</a>
+                        </li>
+                        <li>
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <a href="mailto:godavariconstruction2016@gmail.com">godavariconstruction2016@gmail.com</a>
+                        </li>
                     </ul>
                 </div>
             </div>
+
             <div class="footer-bottom">
-                <p>&copy; 2026 Godavari Construction. All rights reserved. | Built For Excellence</p>
-                <div class="footer-contact-icons">
+                <p>&copy; 2026 Godavari Construction. All rights reserved.</p>
+                <div class="footer-bottom-links">
                     <a href="https://wa.me/917620488247" class="footer-icon whatsapp" title="WhatsApp Us">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        WhatsApp
                     </a>
                     <a href="tel:+917620488247" class="footer-icon call" title="Call Us">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        Call Us
                     </a>
                 </div>
             </div>
@@ -147,5 +664,189 @@
     </div>
 
     <script type="module" src="src/main.ts"></script>
+    <script>
+    (() => {
+        // ── Filter System ──
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.portfolio-card');
+        const countEl = document.getElementById('project-count');
+        const noResults = document.getElementById('no-results');
+
+        function updateCount(visible) {
+            countEl.textContent = visible + ' Project' + (visible !== 1 ? 's' : '');
+        }
+
+        function revealCards(visibleCards) {
+            visibleCards.forEach((card, i) => {
+                setTimeout(() => {
+                    card.classList.add('revealed');
+                }, i * 80);
+            });
+        }
+
+        function applyFilter(filter) {
+            let visible = 0;
+            const visibleCards = [];
+            cards.forEach(card => {
+                const cat = card.dataset.category;
+                if (filter === 'all' || cat === filter) {
+                    card.classList.remove('hidden');
+                    card.classList.remove('revealed');
+                    visibleCards.push(card);
+                    visible++;
+                } else {
+                    card.classList.add('hidden');
+                    card.classList.remove('revealed');
+                }
+            });
+            noResults.style.display = visible === 0 ? 'block' : 'none';
+            updateCount(visible);
+            setTimeout(() => revealCards(visibleCards), 50);
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                applyFilter(btn.dataset.filter);
+            });
+        });
+
+        // Initial reveal
+        applyFilter('all');
+
+        // ── Modal System ──
+        const modal = document.getElementById('modal');
+        const modalClose = document.getElementById('modal-close');
+        const modalMedia = document.getElementById('modal-media');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMeta = document.getElementById('modal-meta');
+        const modalCounter = document.getElementById('modal-counter');
+        const modalPrev = document.getElementById('modal-prev');
+        const modalNext = document.getElementById('modal-next');
+
+        let currentIndex = 0;
+        let visibleCards = [];
+
+        function getMedia(card) {
+            const video = card.querySelector('video');
+            const img = card.querySelector('img');
+            return video ? { type: 'video', src: video.src } : { type: 'img', src: img.src };
+        }
+
+        function openModal(index) {
+            visibleCards = Array.from(cards).filter(c => !c.classList.contains('hidden'));
+            currentIndex = index;
+            renderModal();
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function renderModal() {
+            const card = visibleCards[currentIndex];
+            const media = getMedia(card);
+            modalTitle.textContent = card.dataset.title;
+            modalMeta.innerHTML = `
+                <span>📍 ${card.dataset.location}</span>
+                <span>🏗 ${card.dataset.type}</span>
+                <span>📐 ${card.dataset.area}</span>
+                <span>📅 ${card.dataset.year}</span>
+            `;
+            modalCounter.textContent = (currentIndex + 1) + ' / ' + visibleCards.length;
+
+            // Build media element
+            modalMedia.innerHTML = '';
+            if (media.type === 'video') {
+                const v = document.createElement('video');
+                v.src = media.src;
+                v.autoplay = true;
+                v.muted = true;
+                v.loop = true;
+                v.playsInline = true;
+                v.style.cssText = 'width:100%;height:100%;max-height:72vh;object-fit:contain;';
+                modalMedia.appendChild(v);
+            } else {
+                const img = document.createElement('img');
+                img.src = media.src;
+                img.alt = card.dataset.title;
+                img.style.cssText = 'width:100%;height:100%;max-height:72vh;object-fit:contain;';
+                modalMedia.appendChild(img);
+            }
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+            modalMedia.innerHTML = '';
+        }
+
+        cards.forEach((card, i) => {
+            card.addEventListener('click', () => {
+                const vi = Array.from(cards).filter(c => !c.classList.contains('hidden'));
+                const idx = vi.indexOf(card);
+                if (idx === -1) return;
+                visibleCards = vi;
+                currentIndex = idx;
+                openModal(currentIndex);
+            });
+        });
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+        modalPrev.addEventListener('click', e => {
+            e.stopPropagation();
+            currentIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length;
+            renderModal();
+        });
+        modalNext.addEventListener('click', e => {
+            e.stopPropagation();
+            currentIndex = (currentIndex + 1) % visibleCards.length;
+            renderModal();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (!modal.classList.contains('open')) return;
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowLeft') { currentIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length; renderModal(); }
+            if (e.key === 'ArrowRight') { currentIndex = (currentIndex + 1) % visibleCards.length; renderModal(); }
+        });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('hidden')) {
+                    entry.target.classList.add('revealed');
+                }
+            });
+        }, { threshold: 0.1 });
+        cards.forEach(c => observer.observe(c));
+
+        // Mobile swipe for modal
+        let touchStartX = 0;
+        modalMedia.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+        modalMedia.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) { currentIndex = (currentIndex + 1) % visibleCards.length; }
+                else { currentIndex = (currentIndex - 1 + visibleCards.length) % visibleCards.length; }
+                renderModal();
+            }
+        });
+
+        // Hover to play video for project cards
+        cards.forEach(card => {
+            const video = card.querySelector('video');
+            if (video && !video.hasAttribute('autoplay')) {
+                card.addEventListener('mouseenter', () => {
+                    video.play().catch(e => console.log('Autoplay prevented:', e));
+                });
+                card.addEventListener('mouseleave', () => {
+                    video.pause();
+                });
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
