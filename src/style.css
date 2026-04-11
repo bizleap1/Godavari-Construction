@@ -472,7 +472,7 @@ html.lenis {
 }
 
 .about-content p {
-    color: var(--text-muted);
+    color: var(--text-primary);
     margin-bottom: 20px;
 }
 
@@ -1587,5 +1587,86 @@ html.lenis {
     }
     .subpage-title h1 {
         font-size: 2.2rem !important;
+    }
+}
+
+/* Leadership Section Styles */
+.leadership-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px;
+    margin-top: 60px;
+}
+
+.team-card {
+    text-align: center;
+    background: var(--white);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: var(--trans-smooth);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.08);
+}
+
+.team-image-wrap {
+    width: 280px;
+    height: 350px;
+    margin: 0 auto 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: 3px solid var(--primary);
+}
+
+.team-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.team-card:hover .team-image-wrap img {
+    transform: scale(1.05);
+}
+
+.team-info h3 {
+    font-size: 1.8rem;
+    color: var(--secondary);
+    margin-bottom: 8px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.team-info .role {
+    color: var(--primary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.team-info p {
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+    .leadership-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .team-image-wrap {
+        width: 100%;
+        max-width: 320px;
+        height: 400px;
     }
 }
